@@ -5,7 +5,6 @@ public class Jogador {
     private int idade;
     private int gols;
     private int numCamisa;
-    private boolean emTime = false;
 
     public Jogador() {
     }
@@ -46,14 +45,6 @@ public class Jogador {
 
     public void setNumCamisa(int numCamisa) {
         this.numCamisa = numCamisa;
-    }
-
-    public boolean isEmTime() {
-        return emTime;
-    }
-
-    public void setEmTime(boolean emTime) {
-        this.emTime = emTime;
     }
 
     @Override

@@ -41,21 +41,15 @@ public class Time {
     }
 
     public void adicionarJogador(Jogador jogador) {
-        if (!jogador.isEmTime()) {
-            jogadores.add(jogador);
-            jogador.setEmTime(true); // Marca o jogador como estando em um time
-            System.out.println("Jogador adicionado ao time com sucesso!");
-        } else {
-            System.out.println("Jogador já está em um time.");
-        }
+        jogadores.add(jogador);
     }
 
     public void removerJogador(Jogador jogador) {
-        if (jogadores.remove(jogador)) {
-            jogador.setEmTime(false); // Marca o jogador como não estando mais em um time
-        } else {
-            System.out.println("Jogador não encontrado no time.");
-        }
+        jogadores.remove(jogador);
+    }
+
+    public boolean estaSemJogadores() {
+        return jogadores.isEmpty();
     }
 
     public int getVitorias() {
@@ -80,6 +74,11 @@ public class Time {
 
     public void setEmpates(int empates) {
         this.empates = empates;
+    }
+
+    @Override
+    public String toString() {
+        return "nome: '" + nome;
     }
 
 }

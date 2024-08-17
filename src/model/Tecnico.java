@@ -54,4 +54,10 @@ public class Tecnico {
     public void setEmpates(int empates) {
         this.empates = empates;
     }
+
+    @Override
+    public String toString() {
+        return "nome: '" + nome + '\''+
+               ", idade: " + idade;
+    }
 }
