@@ -3,6 +3,7 @@ package service;
 import model.Jogador;
 import model.Tecnico;
 import model.Time;
+import view.TimeView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,19 +14,15 @@ public class TimeService {
     private List<Jogador> bancoDeJogadores = new ArrayList<>();
     private List<Time> times = new ArrayList<>();
     private Scanner scanner;
+    private TimeView timeView;
 
     public TimeService(Scanner scanner) {
         this.scanner = scanner;
+        this.timeView = new TimeView(scanner);
     }
 
     public void createTecnico() {
-        System.out.print("Nome do técnico: ");
-        String nome = scanner.nextLine();
-        System.out.print("Idade do técnico: ");
-        int idade = scanner.nextInt();
-        scanner.nextLine();
-
-        Tecnico tecnico = new Tecnico(nome, idade);
+        Tecnico tecnico = timeView.createTecnico();
         bancoDeTecnicos.add(tecnico);
         System.out.println("Técnico adicionado ao banco com sucesso!");
     }
