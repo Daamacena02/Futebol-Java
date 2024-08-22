@@ -8,11 +8,6 @@ import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    private static List<Tecnico> bancoDeTecnicos = new ArrayList<>();
-    private static List<Jogador> bancoDeJogadores = new ArrayList<>();
-    private static List<Time> times = new ArrayList<>();
-
-
     public static void showMenu() {
         System.out.println("1 - Adicionar técnico ao banco");
         System.out.println("2 - Adicionar jogador ao banco");
