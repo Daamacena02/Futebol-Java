@@ -10,133 +10,90 @@ import java.util.List;
 import java.util.Scanner;
 
 public class TimeService {
-    private List<Tecnico> bancoDeTecnicos = new ArrayList<>();
-    private List<Jogador> bancoDeJogadores = new ArrayList<>();
-    private List<Time> times = new ArrayList<>();
-    private Scanner scanner;
-    private TimeView timeView;
+    private final List<Tecnico> bancoDeTecnicos = new ArrayList<>();
+    private final List<Jogador> bancoDeJogadores = new ArrayList<>();
+    private final List<Time> times = new ArrayList<>();
+    private final TimeView timeView;
 
     public TimeService(Scanner scanner) {
-        this.scanner = scanner;
         this.timeView = new TimeView(scanner);
     }
 
     public void createTecnico() {
-        Tecnico tecnico = timeView.createTecnico();
+        Tecnico tecnico = timeView.insertNewTecnico();
         bancoDeTecnicos.add(tecnico);
         System.out.println("Técnico adicionado ao banco com sucesso!");
     }
 
     public void createJogador() {
-        System.out.print("Nome do jogador: ");
-        String nome = scanner.nextLine();
-        System.out.print("Idade do jogador: ");
-        int idade = scanner.nextInt();
-        System.out.print("Número da camisa do jogador: ");
-        int numCamisa = scanner.nextInt();
-        scanner.nextLine();
-
-        Jogador jogador = new Jogador(nome, idade, numCamisa);
+        Jogador jogador = timeView.insertNewJogador();
         bancoDeJogadores.add(jogador);
         System.out.println("Jogador adicionado ao banco com sucesso!");
     }
 
     public void createTime() {
-        System.out.print("Nome do time: ");
-        String nome = scanner.nextLine();
-
         if (bancoDeTecnicos.isEmpty()) {
-            System.out.println("Nenhum técnico disponível no banco. Adicione um técnico primeiro.");
-            return;
+            throw new RuntimeException("Nenhum técnico disponível no banco. Adicione um técnico primeiro.");
         }
 
-        System.out.println("Escolha um técnico pelo código:");
-        showOptionsSelectFromList(bancoDeTecnicos);
-        int tecnicoIndex = scanner.nextInt();
-        scanner.nextLine();
-        Tecnico tecnico = bancoDeTecnicos.get(tecnicoIndex);
-        bancoDeTecnicos.remove(tecnico);
-        Time time = new Time(nome, tecnico);
+        Time time = timeView.insertNewTime(bancoDeTecnicos);
+        Tecnico tecnicoEscolhido = time.getTecnico();
+        bancoDeTecnicos.remove(tecnicoEscolhido);
+
         times.add(time);
         System.out.println("Time adicionado com sucesso!");
     }
 
     public  void escalarJogadorEmTime() {
-        System.out.println("Escolha um time para adicionar um jogador:");
         if (times.isEmpty()) {
-            System.out.println("Nenhum time cadastrado. Adicione um time primeiro.");
-            return;
+            throw new RuntimeException("não há times disponíveis");
         }
-        showOptionsSelectFromList(times);
-        int timeIndex = scanner.nextInt();
-        scanner.nextLine();
-        Time time = times.get(timeIndex);
 
         if (bancoDeJogadores.isEmpty()) {
-            System.out.println("Nenhum jogador disponível no banco. Adicione um jogador primeiro.");
-            return;
+            throw new RuntimeException("não há jogadores disponíveis no banco");
         }
 
-        System.out.println("Escolha um jogador do banco:");
-        showOptionsSelectFromList(bancoDeJogadores);
-        int jogadorIndex = scanner.nextInt();
-        scanner.nextLine();
-        Jogador jogador = bancoDeJogadores.get(jogadorIndex);
+        Time time = timeView.chooseSomeTime(times);
+        Jogador jogador = timeView.chooseSomeJogador(bancoDeJogadores);
+
         time.adicionarJogador(jogador);
         bancoDeJogadores.remove(jogador);
-
+        System.out.println("Jogador escalado com sucesso");
     }
 
     public void removerJogadorDoTime() {
-        System.out.println("Escolha um time para remover um jogador:");
         if (times.isEmpty()) {
-            System.out.println("Nenhum time cadastrado. Adicione um time primeiro.");
-            return;
-            // tirar do time e adicionar o jogador no banco
+            throw new RuntimeException("Nenhum time cadastrado. Adicione um time primeiro.");
         }
-        showOptionsSelectFromList(times);
-        int timeIndex = scanner.nextInt();
-        scanner.nextLine();
-        Time time = times.get(timeIndex);
+
+        Time time = timeView.chooseSomeTime(times);
 
         if (time.estaSemJogadores()) {
-            System.out.println("Nenhum jogador disponível no time. Adicione um jogador primeiro.");
-            return;
+            throw new RuntimeException("Nenhum jogador disponível no time. Adicione um jogador primeiro.");
         }
-        System.out.println("Escolha um jogador do time para remover:");
-        for (int i = 0; i < time.getJogadores().size(); i++) {
-            System.out.println(i + " - " + time.getJogadores().get(i).getNome());
-        }
-        int jogadorIndex = scanner.nextInt();
-        scanner.nextLine();
-        Jogador jogador = time.getJogadores().get(jogadorIndex);
+
+        List<Jogador> jogadoresParaEscolher = time.getJogadores();
+        Jogador jogador = timeView.chooseSomeJogador(jogadoresParaEscolher);
+
         time.removerJogador(jogador);
         bancoDeJogadores.add(jogador);
         System.out.println("Jogador removido do time com sucesso!");
     }
 
     public void substituirTecnicoDoTime() {
-        System.out.println("Escolha um time para substituir o técnico:");
         if (times.isEmpty()) {
-            System.out.println("Nenhum time cadastrado. Adicione um time primeiro.");
-            return;
+            throw new RuntimeException("Nenhum time cadastrado. Adicione um time primeiro.");
         }
+
         if (bancoDeTecnicos.isEmpty()) {
-            System.out.println("Nenhum tecnico no banco. Adicione algum tecnico primeiro.");
-            return;
+            throw new RuntimeException("Nenhum tecnico no banco. Adicione algum tecnico primeiro.");
         }
-        showOptionsSelectFromList(times);
-        int timeIndex = scanner.nextInt();
-        scanner.nextLine();
-        Time timeParaSubstituicao = times.get(timeIndex);
 
-        System.out.println("Escolha um tecnico do banco para substitir o atual:");
-        showOptionsSelectFromList(bancoDeTecnicos);
-        int tecnicoIndex = scanner.nextInt();
-        scanner.nextLine();
-        Tecnico novoTecnico = bancoDeTecnicos.get(tecnicoIndex);
+        Time timeParaSubstituicao = timeView.chooseSomeTime(times);
+        Tecnico novoTecnico = timeView.chooseSomeTecnico(bancoDeTecnicos);
+        Tecnico tecnicoParaRemover = timeParaSubstituicao.getTecnico();
 
-        bancoDeTecnicos.add(timeParaSubstituicao.getTecnico());
+        bancoDeTecnicos.add(tecnicoParaRemover);
         timeParaSubstituicao.setTecnico(novoTecnico);
         bancoDeTecnicos.remove(novoTecnico);
         System.out.println("Técnico removido do time com sucesso!");
@@ -145,31 +102,20 @@ public class TimeService {
 
     public void listarTimes() {
         if (times.isEmpty()) {
-            System.out.println("Nenhum time cadastrado.");
-            return;
+            throw new RuntimeException("Não há times criados para mostrar.");
         }
 
         for (Time time : times) {
-            System.out.println("Time: " + time.getNome());
-            System.out.println("Técnico: " + time.getTecnico().getNome());
-            System.out.println("Jogadores:");
-            for (Jogador jogador : time.getJogadores()) {
-                System.out.println("- " + jogador);
-            }
-            System.out.println();
+            timeView.showTime(time);
         }
     }
 
     public void listarBanco() {
         System.out.println("Técnicos no banco:");
-        for (Tecnico tecnico : bancoDeTecnicos) {
-            System.out.println("- " + tecnico.getNome());
-        }
+        timeView.showTecnicos(bancoDeTecnicos);
 
         System.out.println("Jogadores no banco:");
-        for (Jogador jogador : bancoDeJogadores) {
-            System.out.println("- " + jogador);
-        }
+        timeView.showJogadores(bancoDeJogadores);
     }
 
     private void showOptionsSelectFromList(List<?> list){
